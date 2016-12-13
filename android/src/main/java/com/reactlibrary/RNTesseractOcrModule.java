@@ -134,12 +134,12 @@
     }
 
     @ReactMethod
-    public void startOcr(String path, String lang, Promise promise) {
+    public void startOcr(String path, String lang, String whiteList, Promise promise) {
       prepareTesseract();
 
       Log.d(REACT_CLASS, "Start ocr images");
       
-      try{
+      try {
         BitmapFactory.Options options = new BitmapFactory.Options();
 
         // TODO: 
@@ -149,7 +149,7 @@
         //options.inSampleSize = 4; //inSampleSize documentation --> http://goo.gl/KRrlvi
         Bitmap bitmap = BitmapFactory.decodeFile(path, options);
 
-        String result = extractText(bitmap, lang);
+        String result = extractText(bitmap, lang, whiteList);
         
         promise.resolve(result);
 
@@ -160,7 +160,7 @@
     }
 
 
-    private String extractText(Bitmap bitmap, String lang) {
+    private String extractText(Bitmap bitmap, String lang, String whiteList) {
       try {
         tessBaseApi = new TessBaseAPI();
       } catch (Exception e) {
@@ -176,7 +176,10 @@
   // 
   //  //Whitelist - List of characters you want to detect
   //  //Example: You just want to detect digits (0-9)
-  //  tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, "1234567890");
+      if (whiteList != null && !whiteList.isEmpty()) {
+        tessBaseApi.setVariable(TessBaseAPI.VAR_CHAR_WHITELIST, whiteList);
+      }
+      
   //  
   //  //Blacklist - List of characters you DON'T want to detect
   //  //Example: You DON'T want to detect some special characters
